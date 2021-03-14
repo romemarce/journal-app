@@ -1,12 +1,16 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom'
+import validator from 'validator';
 import { startGoogleLogin, startLoginEmailPassword } from '../../actions/auth';
+import { removeError, setError } from '../../actions/ui';
 import { useForm } from '../../hooks/useForm';
 
 export const LoginScreen = () => {
 
   const dispatch = useDispatch();
+
+
 
   const [formValues, handleInputChange] = useForm({
     email: "romerodev001@gmail.com",
@@ -17,11 +21,25 @@ export const LoginScreen = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    dispatch(
-      // login(12345, 'Marcelo')
-      startLoginEmailPassword(email, password)
-    );
-  }
+
+    if (isValidForm()) {
+      dispatch( startLoginEmailPassword(email, password) );  
+    }
+ }
+
+ const isValidForm = () => {
+   if (!validator.isEmail(email)) {
+     dispatch( setError("email is not valid") );
+     return false;
+   }else if(password.lenght === 0){
+    dispatch( setError("Password is empty") );
+    return false;
+   }
+
+   dispatch( removeError() );
+
+   return true;
+ }
 
   const handleGoogleLogin = () => {
     dispatch( startGoogleLogin() );
